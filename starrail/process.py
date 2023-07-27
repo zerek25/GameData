@@ -86,8 +86,8 @@ def process_achievements():
         for param in achievement["ParamList"]:
             param_key = "#" + str(i) + "[i]"
             param_pos = desc.find(param_key) + len(param_key)
-            if param_pos > len(desc):
-                param_pos = 0
+            if param_pos >= len(desc):
+                param_pos = len(desc) - 1
             last_char = desc[param_pos]
             if last_char == '%':
                 desc = desc.replace(param_key, str(round(param["Value"] * 100)))
