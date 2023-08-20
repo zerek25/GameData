@@ -3,6 +3,8 @@ import wx
 from starrail import process as srp
 from starrail import database as srdb
 
+from genshin import database as gidb
+
 
 class GameData(wx.Frame):
 
@@ -24,6 +26,14 @@ class GameData(wx.Frame):
         gi_title = wx.StaticText(panel, -1, u"原神")
         gi_title.SetFont(title_font)
         bs_gi.Add(gi_title)
+
+        gi_generate_image = wx.Button(panel, -1, "生成全成就图片")
+        gi_generate_image.Bind(wx.EVT_BUTTON, self.export_gi_achievement_image)
+        bs_gi.Add(gi_generate_image)
+
+        gi_generate_excel = wx.Button(panel, -1, "生成全成就Excel")
+        gi_generate_excel.Bind(wx.EVT_BUTTON, self.export_gi_achievement_excel)
+        bs_gi.Add(gi_generate_excel)
 
         gs.Add(bs_gi)
 
@@ -60,6 +70,16 @@ class GameData(wx.Frame):
         gs.Add(bs_sr)
 
         panel.SetSizer(gs)
+
+    @staticmethod
+    def export_gi_achievement_image(e):
+        gidb.export_achievement_image()
+        print("全成就图片已生成")
+
+    @staticmethod
+    def export_gi_achievement_excel(e):
+        gidb.export_achievement_excel()
+        print("全成就Excel已生成")
 
     @staticmethod
     def export_sr_player_level_json(e):

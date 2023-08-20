@@ -31,10 +31,7 @@ def _get_reward(reward_id):
         count_str = "Count_" + str(i)
         if item_id_str in reward_info:
             item_id = reward_info.get(item_id_str)
-            item_name_hash = item_config.get(str(item_id)) \
-                             or item_config_relic.get(str(item_id)) \
-                             or item_config_avatar_rank.get(str(item_id)) \
-                             or item_config_equipment.get(str(item_id))
+            item_name_hash = item_config.get(str(item_id)) or item_config_relic.get(str(item_id)) or item_config_avatar_rank.get(str(item_id)) or item_config_equipment.get(str(item_id))
             item_name_hash = item_name_hash["ItemName"]["Hash"]
             item_name = text_map_cn.get(str(item_name_hash))
             count = reward_info.get(count_str)
