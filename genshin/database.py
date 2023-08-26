@@ -30,7 +30,7 @@ def write_achievement():
 # 生成成就excel文件
 def export_achievement_excel():
     print("开始生成成就Excel")
-    header = ["ID", "成就", "描述", "合辑", "奖励", "状态", "版本"]
+    header = ["ID", "成就", "描述", "合辑", "奖励", "状态", "版本", "标签", "图文", "视频", "详情", "考据"]
     achievement_list = [header]
     series_dict = global_var_gi.get_gi_value("AchievementGoalExcelConfigData")
     version_dict = {}
@@ -38,9 +38,9 @@ def export_achievement_excel():
     for achievement in global_var_gi.get_gi_value("AchievementExcelConfigData").values():
         sid = achievement["sid"]
         version = achievement["version"]
-        achievement_data = [achievement["id"], achievement["title"], achievement["desc"],
-                            series_dict.get(sid)["title"], achievement["reward"],
-                            "隐藏" if achievement["hide"] else "公开", version + "\t"]
+        achievement_data = [achievement["id"], achievement["title"], achievement["desc"], series_dict.get(sid)["title"],
+                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t", achievement["tag"][0] if len(achievement["tag"]) else "",
+                            str(achievement["article"]), str(achievement["video"]), achievement["detail"], achievement["reference"]]
 
         # 全成就
         achievement_list.append(achievement_data)
@@ -57,27 +57,27 @@ def export_achievement_excel():
 
     print("生成全成就Excel")
     excel_data = [{
-        "title": "星穹铁道1.1版本全成就",
+        "title": "原神全成就",
         "sheet_name": "全成就",
         "list": achievement_list,
     }]
     xlsx.generate_excel(excel_data, "全成就-单表", "genshin/output/xlsx", "genshin")
 
-    print("生成合辑Excel")
-    series_excel_data = []
-    for series in sorted(series_dict.values(), key=itemgetter('order')):
-        series_excel_data.append({
-            "title": "合辑『" + series["title"] + "』成就",
-            "sheet_name": series["title"],
-            "list": series["list"]
-        })
-    xlsx.generate_excel(series_excel_data, "全成就-合辑分表", "genshin/output/xlsx", "genshin")
+    # print("生成合辑Excel")
+    # series_excel_data = []
+    # for series in sorted(series_dict.values(), key=itemgetter('order')):
+    #     series_excel_data.append({
+    #         "title": "合辑『" + series["title"] + "』成就",
+    #         "sheet_name": series["title"],
+    #         "list": series["list"]
+    #     })
+    # xlsx.generate_excel(series_excel_data, "全成就-合辑分表", "genshin/output/xlsx", "genshin")
 
     print("生成版本Excel")
     version_excel_data = []
     for version in sorted(version_dict, reverse=False):
         version_excel_data.append({
-            "title": "星穹铁道 " + version + " 版本成就",
+            "title": "原神 " + version + " 版本成就",
             "sheet_name": version + "版本",
             "list": version_dict[version]
         })
@@ -87,7 +87,7 @@ def export_achievement_excel():
 # 生成成就图片
 def export_achievement_image():
     print("开始生成成就图片")
-    header = ["ID", "成就", "描述", "合辑", "奖励", "状态", "版本"]
+    header = ["ID", "成就", "描述", "合辑", "奖励", "状态", "版本", "标签", "详情", "考据"]
     achievement_list = [header]
     series_dict = global_var_gi.get_gi_value("AchievementGoalExcelConfigData")
     version_dict = {}
@@ -95,9 +95,9 @@ def export_achievement_image():
     for achievement in global_var_gi.get_gi_value("AchievementExcelConfigData").values():
         sid = achievement["sid"]
         version = achievement["version"]
-        achievement_data = [achievement["id"], achievement["title"], achievement["desc"],
-                            series_dict.get(sid)["title"], achievement["reward"],
-                            "隐藏" if achievement["hide"] else "公开", version + "\t"]
+        achievement_data = [achievement["id"], achievement["title"], achievement["desc"], series_dict.get(sid)["title"],
+                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t", achievement["tag"][0] if len(achievement["tag"]) else "",
+                            achievement["detail"], achievement["reference"]]
 
         # 全成就
         achievement_list.append(achievement_data)
@@ -120,15 +120,15 @@ def export_achievement_image():
     # }]
     # xlsx.generate_image(excel_data, "genshin/output/image", "genshin")
 
-    print("生成合辑图片")
-    series_excel_data = []
-    for series in series_dict:
-        series_excel_data.append({
-            "title": "合辑『" + series_dict[series]["title"] + "』成就",
-            "sheet_name": str(series_dict[series]["order"]) + " - " + series_dict[series]["title"],
-            "list": series_dict[series]["list"]
-        })
-    xlsx.generate_image(series_excel_data, "genshin/output/image/series", "genshin")
+    # print("生成合辑图片")
+    # series_excel_data = []
+    # for series in series_dict:
+    #     series_excel_data.append({
+    #         "title": "合辑『" + series_dict[series]["title"] + "』成就",
+    #         "sheet_name": str(series_dict[series]["order"]) + " - " + series_dict[series]["title"],
+    #         "list": series_dict[series]["list"]
+    #     })
+    # xlsx.generate_image(series_excel_data, "genshin/output/image/series", "genshin")
 
     print("生成版本图片")
     version_excel_data = []

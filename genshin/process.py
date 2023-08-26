@@ -69,8 +69,8 @@ def process_achievements():
         achievement_detail = achievement_local.get("detail", "")
         achievement_reference = achievement_local.get("reference", "")
         achievement_mission = achievement_local.get("mission", "")
-        achievement_video = achievement_local.get("video", "")
-        achievement_article = achievement_local.get("article", "")
+        achievement_video = achievement_local.get("video", [])
+        achievement_article = achievement_local.get("article", [])
 
         # 多来源数据
         if achievement_trigger not in config_trigger:
@@ -96,10 +96,10 @@ def process_achievements():
                     achievement_tag.append(item)
                     achievement_tag_temp.remove(item)
                     count += 1
+            if config_tag[tag].get("showMain", False) and (tag in achievement_tag_temp or count > 0):
+                achievement_tag.append(tag)
             if tag in achievement_tag_temp:
                 achievement_tag_temp.remove(tag)
-            if config_tag[tag].get("showMain", False) and count > 0:
-                achievement_tag.append(tag)
         unused_tag.update(achievement_tag_temp)
 
         achievement_list[achievement_id] = {

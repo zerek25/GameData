@@ -309,7 +309,7 @@
   },
   "TRIGGER_COMBAT_CONFIG_COMMON":{
     "triggerType":"TRIGGER_COMBAT_CONFIG_COMMON",
-    "triggerDesc":"战斗",
+    "triggerDesc":"战斗或探索",
     "triggerTags":[]
   },
   "TRIGGER_UNLOCK_SPECIFIC_RECIPE_OR":{
