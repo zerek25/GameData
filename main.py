@@ -1,5 +1,9 @@
 # coding:utf-8
+import tkinter
+
 import wx
+
+import xlsx
 from starrail import process as srp
 from starrail import database as srdb
 
@@ -34,6 +38,10 @@ class GameData(wx.Frame):
         gi_generate_excel = wx.Button(panel, -1, "生成全成就Excel")
         gi_generate_excel.Bind(wx.EVT_BUTTON, self.export_gi_achievement_excel)
         bs_gi.Add(gi_generate_excel)
+
+        gi_cloud_file = wx.Button(panel, -1, "UniCloud文件")
+        gi_cloud_file.Bind(wx.EVT_BUTTON, self.export_gi_unicloud_json)
+        bs_gi.Add(gi_cloud_file)
 
         gs.Add(bs_gi)
 
@@ -80,6 +88,9 @@ class GameData(wx.Frame):
     def export_gi_achievement_excel(e):
         gidb.export_achievement_excel()
         print("全成就Excel已生成")
+    @staticmethod
+    def export_gi_unicloud_json(e):
+        gidb.export_unicloud_file()
 
     @staticmethod
     def export_sr_player_level_json(e):
@@ -109,6 +120,7 @@ class GameData(wx.Frame):
 
 
 def main():
+    gidb.export_achievement_detail_image("丑的美学")
     app = wx.App()
     gd = GameData(None)
     gd.Show()

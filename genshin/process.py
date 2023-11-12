@@ -4,7 +4,7 @@ import json
 import os
 
 from util import global_var_gi
-from genshin import path, config
+from genshin import path, config, database
 
 
 # 处理成就
@@ -128,3 +128,5 @@ def process_achievements():
         print("未标记的tag:", list(unused_tag))
     config.set_data("trigger", config_trigger)
     global_var_gi.set_gi_value("AchievementExcelConfigData", achievement_list)
+    # 写入数据库
+    database.write_achievement()

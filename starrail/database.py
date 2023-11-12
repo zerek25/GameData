@@ -11,8 +11,8 @@ from starrail import path
 # 数据库设置
 CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
 DB = CLIENT["findie"]
-ACHIEVEMENT_COL = DB["findie-achievement"]
-SERIES_COL = DB["findie-series"]
+ACHIEVEMENT_COL = DB["sr-achievement"]
+SERIES_COL = DB["sr-series"]
 
 RARITY_LIST = {
     "High": {

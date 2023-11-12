@@ -148,7 +148,7 @@ def generate_excel(data, file_name, path, color_type="genshin"):
 
 
 # 使用xlwings生成表格图片
-def generate_image(data, path, color_type="genshin"):
+def generate_image(data, path, color_type="genshin", image_type="achievement"):
     # 检测路径是否存在
     if not os.path.exists(path):
         os.mkdir(path)
@@ -187,6 +187,8 @@ def generate_image(data, path, color_type="genshin"):
         # 整体设置
         # 设置列宽
         column_widths = get_column_widths(sheet_data["list"], 2)
+        if image_type == "detail":
+            column_widths = [16, 100]
         for col in range(len(table.columns)):
             width = column_widths[col - 1]
             table.columns(col).column_width = width
@@ -232,7 +234,7 @@ def generate_image(data, path, color_type="genshin"):
         title.api.HorizontalAlignment = -4108
 
         # 设置副标题样式
-        subtitle.font.size = 20
+        subtitle.font.size = 16
         subtitle.font.name = "钉钉进步体"
         subtitle.color = COLORS[color_type]["primary"]
         subtitle.font.color = COLORS[color_type]["text"]

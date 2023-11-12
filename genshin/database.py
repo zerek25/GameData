@@ -4,27 +4,55 @@
 from operator import itemgetter
 
 import pymongo
+from bson import json_util
 
 import xlsx
+from genshin import path
 from util import global_var_gi
+from util.lib import get_article_url
 
 CLIENT = pymongo.MongoClient("mongodb://localhost:27017/")
 DB = CLIENT["gwh"]
-ACHIEVEMENT_COL = DB["gwh-achievement"]
-SERIES_COL = DB["gwh-series"]
+ACHIEVEMENT_COL = DB["gi-achievement"]
+SERIES_COL = DB["gi-series"]
 
 
 # 写入数据库
 def write_achievement():
-    for achievement in global_var_gi.get_gi_value("AchievementData").values():
+    for achievement in global_var_gi.get_gi_value("AchievementExcelConfigData").values():
         achievement_filter = {'id': achievement["id"]}
         achievement_set = {"$set": achievement}
         ACHIEVEMENT_COL.update_one(achievement_filter, achievement_set, upsert=True)
 
-    for achievement in global_var_gi.get_gi_value("AchievementSeries").values():
+    for achievement in global_var_gi.get_gi_value("AchievementGoalExcelConfigData").values():
         achievement_filter = {'id': achievement["id"]}
         achievement_set = {"$set": achievement}
         SERIES_COL.update_one(achievement_filter, achievement_set, upsert=True)
+
+
+# 生成uniCloud导出文件
+def export_unicloud_file():
+    with open(path.get("AchievementCloudOutputPath"), 'a+', encoding='utf-8') as f:
+        # 清空文件
+        f.seek(0)
+        f.truncate()
+        for achievement in ACHIEVEMENT_COL.find():
+            # 添加记录
+            uni_article = ""
+            for article in achievement["article"]:
+                if article.find("weixin") > 0:
+                    uni_article = article
+                    break
+            achievement["article"] = uni_article
+            f.write(json_util.dumps(achievement, ensure_ascii=False, ) + "\n")
+    with open(path.get("SeriesCloudOutputPath"), 'a+', encoding='utf-8') as f:
+        # 清空文件
+        f.seek(0)
+        f.truncate()
+        for goal in SERIES_COL.find():
+            # 添加记录
+            f.write(json_util.dumps(goal, ensure_ascii=False, ) + "\n")
+    print("已生成uniCloud导出文件")
 
 
 # 生成成就excel文件
@@ -38,9 +66,12 @@ def export_achievement_excel():
     for achievement in global_var_gi.get_gi_value("AchievementExcelConfigData").values():
         sid = achievement["sid"]
         version = achievement["version"]
+        article = get_article_url(achievement["article"],"key")
         achievement_data = [achievement["id"], achievement["title"], achievement["desc"], series_dict.get(sid)["title"],
-                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t", achievement["tag"][0] if len(achievement["tag"]) else "",
-                            str(achievement["article"]), str(achievement["video"]), achievement["detail"], achievement["reference"]]
+                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t",
+                            achievement["tag"][0] if len(achievement["tag"]) else "",
+                            article, str(achievement["video"]), achievement["detail"],
+                            achievement["reference"]]
 
         # 全成就
         achievement_list.append(achievement_data)
@@ -96,7 +127,8 @@ def export_achievement_image():
         sid = achievement["sid"]
         version = achievement["version"]
         achievement_data = [achievement["id"], achievement["title"], achievement["desc"], series_dict.get(sid)["title"],
-                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t", achievement["tag"][0] if len(achievement["tag"]) else "",
+                            achievement["reward"], "隐藏" if achievement["hide"] else "公开", version + "\t",
+                            achievement["tag"][0] if len(achievement["tag"]) else "",
                             achievement["detail"], achievement["reference"]]
 
         # 全成就
@@ -139,3 +171,25 @@ def export_achievement_image():
             "list": version_dict[version]
         })
     xlsx.generate_image(version_excel_data, "genshin/output/image/version", "genshin")
+
+
+# 生成成就详情图片
+def export_achievement_detail_image(id_str):
+    achievement_dict = global_var_gi.get_gi_value("AchievementExcelConfigData")
+    achievement = {}
+    for aid in achievement_dict:
+        if str(aid) == id_str or achievement_dict[aid]["title"] == id_str:
+            achievement = achievement_dict[aid]
+            break
+    achievement_data = [["成就", achievement.get("title")], ["描述", achievement.get("desc")],
+                        ["合辑", achievement.get("series")], ["奖励", achievement.get("reward")],
+                        ["状态", "隐藏" if achievement["hide"] else "公开"],
+                        ["标签", "  ".join(str(i) for i in achievement.get("tag"))],
+                        ["版本", achievement["version"] + "\t"], ["详情", achievement.get("detail")],
+                        ["考据", achievement.get("reference")]]
+    achievement_excel_data = [{
+        "title": "成就详情",
+        "sheet_name": str(achievement["id"]) + "-" + achievement["title"],
+        "list": achievement_data
+    }]
+    xlsx.generate_image(achievement_excel_data, "genshin/output/image/achievement", "genshin", "detail")
